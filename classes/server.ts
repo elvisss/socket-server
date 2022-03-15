@@ -1,16 +1,37 @@
+import http from 'http';
 import express from 'express';
+import socketIO from 'socket.io';
 import { SERVER_PORT } from '../global/environment';
 
 export default class Server {
+  private static _instance: Server;
   public app: express.Application;
   public port: number;
+  public io: socketIO.Server;
+  private httpServer: http.Server;
 
-  constructor() {
+  private constructor() {
     this.app = express();
     this.port = SERVER_PORT;
+    this.httpServer = http.createServer(this.app);
+    this.io = new socketIO.Server(this.httpServer, {
+      cors: { origin: '*', methods: ['GET', 'POST'] },
+    });
+    this.listenSockets();
+  }
+
+  public static get instance() {
+    return this._instance || (this._instance = new Server());
+  }
+
+  private listenSockets() {
+    console.log('listen connections - sockets');
+    this.io.on('connection', (client) => {
+      console.log('client connected');
+    });
   }
 
   start(callback: Function) {
-    this.app.listen(this.port, callback());
+    this.httpServer.listen(this.port, callback());
   }
 }
