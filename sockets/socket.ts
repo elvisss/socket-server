@@ -1,4 +1,4 @@
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 
 export const disconnect = (client: Socket) => {
   client.on('disconnect', () => {
@@ -6,8 +6,9 @@ export const disconnect = (client: Socket) => {
   });
 };
 
-export const message = (client: Socket) => {
-  client.on('message', (payload, callback) => {
+export const message = (client: Socket, io: Server) => {
+  client.on('message', (payload) => {
     console.log('Message received', payload);
+    io.emit('new-message', payload)
   });
 };
