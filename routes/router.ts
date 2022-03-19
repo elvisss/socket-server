@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 import Server from '../classes/server';
+import { userConnected } from '../sockets/socket';
 
 const router = Router();
 
-router.get('/messages', (req: Request, res: Response) => {
+router.get('/messages', (_req: Request, res: Response) => {
   res.json({
     ok: true,
     message: 'everything is ok',
@@ -37,7 +38,6 @@ router.post('/messages/:id', (req: Request, res: Response) => {
   }
 
   const server = Server.instance;
-
   server.io.in(id).emit('private-message', payload);
 
   res.json({
@@ -45,6 +45,33 @@ router.post('/messages/:id', (req: Request, res: Response) => {
     body,
     from,
     id,
+  });
+});
+
+router.get('/users', async(_req: Request, res: Response) => {
+  try {
+    const server = Server.instance;
+    const clients = await server.io.fetchSockets();
+    const ids = clients.map((client) => client.id);
+    console.log({ ids });
+
+    res.json({
+      ok: true,
+      clients: ids
+    })
+  } catch (err) {
+    console.log({ err });
+    res.json({
+      ok: false,
+      err
+    })
+  }
+});
+
+router.get('/users/detail', async(_req: Request, res: Response) => {
+  res.json({
+    ok: true,
+    clients: userConnected.getList(),
   });
 });
 

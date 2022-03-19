@@ -20,7 +20,7 @@ export default class UserList {
   }
 
   public getList(): User[] {
-    return this.list;
+    return this.list.filter(user => user.name !== 'empty');
   }
 
   public getUser(id: string): User | undefined {

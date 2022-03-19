@@ -28,17 +28,18 @@ export default class Server {
 
   private middlewares() {
     this.app.use(express.json());
-    this.app.use(express.urlencoded());
+    this.app.use(express.urlencoded({ extended: true }));
   }
 
   private listenSockets() {
     console.log('listen connections - sockets');
     this.io.on('connection', (client) => {
       console.log(client.id);
-      socket.connectClient(client);
+      socket.connectClient(client, this.io);
       socket.configUser(client, this.io);
       socket.message(client, this.io);
-      socket.disconnect(client);
+      socket.disconnect(client, this.io);
+      socket.getUsers(client, this.io);
     });
   }
 
