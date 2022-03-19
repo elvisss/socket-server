@@ -19,10 +19,16 @@ export default class Server {
       cors: { origin: '*', methods: ['GET', 'POST'] },
     });
     this.listenSockets();
+    this.middlewares();
   }
 
   public static get instance() {
     return this._instance || (this._instance = new Server());
+  }
+
+  private middlewares() {
+    this.app.use(express.json());
+    this.app.use(express.urlencoded());
   }
 
   private listenSockets() {
